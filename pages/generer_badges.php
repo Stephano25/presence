@@ -31,7 +31,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        /* ========== STYLES GÉNÉRAUX DE LA PAGE ========== */
+        /* ========== STYLES GÉNÉRAUX ========== */
         .badge-tabs {
             display: flex;
             gap: 10px;
@@ -63,11 +63,9 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
         
         /* ========== BADGE STANDARD ID-1 VERTICAL ==========
            Format réel : 54 mm × 85.6 mm
-           Ratio : 1 : 1.585
            Taille web : 380 × 602 pixels
            ================================================= */
         .badge-standard {
-            /* Dimensions format ID-1 vertical (badge d'accès standard) */
             width: 380px;
             height: 602px;
             background: #ffffff;
@@ -122,19 +120,19 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             text-transform: uppercase;
         }
         
-        /* Photo */
+        /* Photo - AGRANDIE */
         .badge-photo-section {
             display: flex;
             justify-content: center;
-            padding: 12px 0 6px;
+            padding: 12px 0 0;
             flex-shrink: 0;
         }
         .badge-photo {
-            width: 90px;
-            height: 90px;
+            width: 115px;
+            height: 115px;
             border-radius: 50%;
             border: 4px solid #ffffff;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.18);
             overflow: hidden;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
@@ -148,16 +146,17 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
         }
         .badge-photo .initials {
             color: white;
-            font-size: 32px;
+            font-size: 42px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
-        /* Informations */
+        /* Informations - DÉCALÉES VERS LE BAS */
         .badge-info {
             text-align: center;
-            padding: 4px 15px 8px;
+            padding: 18px 15px 8px;
+            margin-top: 20px;
             flex-shrink: 0;
         }
         .badge-info .nom-complet {
@@ -174,7 +173,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin: 0 0 6px;
+            margin: 0 0 5px;
         }
         .badge-info .departement {
             display: inline-block;
@@ -216,15 +215,15 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             font-family: 'Courier New', monospace;
         }
         
-        /* Zone code QR / code-barres */
+        /* Zone code QR / code-barres - RÉDUITE */
         .badge-code {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 6px 15px;
+            padding: 4px 15px;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             background: #ffffff;
             min-height: 0;
             overflow: hidden;
@@ -565,7 +564,6 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             
             <div class="badge-container">
                 <div class="badge-standard" id="badge-<?= $employeSelectionne['id'] ?>">
-                    <!-- En-tête -->
                     <div class="badge-header">
                         <div class="logo">🏢</div>
                         <div class="title">
@@ -574,7 +572,6 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         </div>
                     </div>
                     
-                    <!-- Photo -->
                     <div class="badge-photo-section">
                         <div class="badge-photo">
                             <?php if (!empty($employeSelectionne['photo']) && file_exists('../' . $employeSelectionne['photo'])): ?>
@@ -585,7 +582,6 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         </div>
                     </div>
                     
-                    <!-- Infos -->
                     <div class="badge-info">
                         <h3 class="nom-complet">
                             <?= htmlspecialchars(strtoupper($employeSelectionne['nom']) . ' ' . $employeSelectionne['prenom']) ?>
@@ -602,18 +598,15 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                     
                     <div class="badge-separator"></div>
                     
-                    <!-- Matricule -->
                     <div class="badge-matricule">
                         <div class="label">Matricule</div>
                         <div class="value"><?= htmlspecialchars($employeSelectionne['matricule']) ?></div>
                     </div>
                     
-                    <!-- Zone QR / Code-barres -->
                     <div class="badge-code" id="code-<?= $employeSelectionne['id'] ?>">
-                        <!-- QR/Code-barres inséré par JavaScript -->
+                        <!-- Le QR/Code-barres sera inséré ici par JavaScript -->
                     </div>
                     
-                    <!-- Footer -->
                     <div class="badge-footer">
                         <span class="date">📅 <?= date('d/m/Y') ?></span>
                         <span class="statut">● ACTIF</span>
@@ -625,8 +618,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
         <script>
             window.addEventListener('load', function() {
                 console.log('=== Badge standard ID-1 ===');
-                console.log('Dimensions: 380 × 602 px (ratio 54 × 85.6 mm)');
-                console.log('QRCode:', typeof QRCode, '| JsBarcode:', typeof JsBarcode);
+                console.log('Photo: 115x115 | QR: 110x110 | Format:', '<?= $format ?>');
                 
                 const matricule = '<?= htmlspecialchars($employeSelectionne['matricule']) ?>';
                 const codeContainer = document.getElementById('code-<?= $employeSelectionne['id'] ?>');
@@ -636,7 +628,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                 codeContainer.style.flexDirection = 'column';
                 codeContainer.style.alignItems = 'center';
                 codeContainer.style.justifyContent = 'center';
-                codeContainer.style.gap = '6px';
+                codeContainer.style.gap = '5px';
                 
                 // ==================== QR CODE UNIQUEMENT ====================
                 if (format === 'qr') {
@@ -651,13 +643,13 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         try {
                             new QRCode(qrDiv, {
                                 text: matricule,
-                                width: 130,
-                                height: 130,
+                                width: 110,
+                                height: 110,
                                 colorDark: '#1e3c72',
                                 colorLight: '#ffffff',
                                 correctLevel: QRCode.CorrectLevel.M
                             });
-                            console.log('✅ QR généré');
+                            console.log('✅ QR généré (110x110)');
                         } catch (e) {
                             console.error('Erreur QR:', e);
                             qrDiv.innerHTML = '<span style="color:red;font-size:11px;">Erreur QR</span>';
@@ -684,12 +676,12 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         try {
                             JsBarcode(barcodeSvg, matricule, {
                                 format: "CODE128",
-                                width: 1.8,
-                                height: 65,
+                                width: 1.5,
+                                height: 55,
                                 displayValue: true,
-                                fontSize: 12,
+                                fontSize: 11,
                                 font: "monospace",
-                                textMargin: 3,
+                                textMargin: 2,
                                 background: "#ffffff",
                                 lineColor: "#1e3c72",
                                 margin: 5
@@ -708,25 +700,25 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                 else if (format === 'both') {
                     console.log('→ QR Code + Code-barres');
                     
-                    // QR CODE
+                    // QR CODE (réduit)
                     const qrDiv = document.createElement('div');
                     qrDiv.style.display = 'flex';
                     qrDiv.style.justifyContent = 'center';
                     qrDiv.style.alignItems = 'center';
-                    qrDiv.style.marginBottom = '4px';
+                    qrDiv.style.marginBottom = '3px';
                     codeContainer.appendChild(qrDiv);
                     
                     if (typeof QRCode === 'function') {
                         try {
                             new QRCode(qrDiv, {
                                 text: matricule,
-                                width: 85,
-                                height: 85,
+                                width: 70,
+                                height: 70,
                                 colorDark: '#1e3c72',
                                 colorLight: '#ffffff',
                                 correctLevel: QRCode.CorrectLevel.M
                             });
-                            console.log('✅ QR généré');
+                            console.log('✅ QR généré (70x70)');
                         } catch (e) {
                             console.error('Erreur QR:', e);
                             qrDiv.innerHTML = '<span style="color:red;font-size:11px;">Erreur QR</span>';
@@ -750,10 +742,10 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         try {
                             JsBarcode(barcodeSvg, matricule, {
                                 format: "CODE128",
-                                width: 1.3,
-                                height: 42,
+                                width: 1.2,
+                                height: 40,
                                 displayValue: true,
-                                fontSize: 10,
+                                fontSize: 9,
                                 font: "monospace",
                                 textMargin: 2,
                                 background: "#ffffff",
@@ -869,7 +861,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                     container.style.flexDirection = 'column';
                     container.style.alignItems = 'center';
                     container.style.justifyContent = 'center';
-                    container.style.gap = '6px';
+                    container.style.gap = '5px';
                     
                     // QR UNIQUEMENT
                     if (format === 'qr') {
@@ -883,8 +875,8 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                             try {
                                 new QRCode(qrDiv, {
                                     text: matricule,
-                                    width: 130,
-                                    height: 130,
+                                    width: 110,
+                                    height: 110,
                                     colorDark: '#1e3c72',
                                     colorLight: '#ffffff',
                                     correctLevel: QRCode.CorrectLevel.M
@@ -911,12 +903,12 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                             try {
                                 JsBarcode(barcodeSvg, matricule, {
                                     format: "CODE128",
-                                    width: 1.8,
-                                    height: 65,
+                                    width: 1.5,
+                                    height: 55,
                                     displayValue: true,
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     font: "monospace",
-                                    textMargin: 3,
+                                    textMargin: 2,
                                     background: "#ffffff",
                                     lineColor: "#1e3c72",
                                     margin: 5
@@ -934,15 +926,15 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         qrDiv.style.display = 'flex';
                         qrDiv.style.justifyContent = 'center';
                         qrDiv.style.alignItems = 'center';
-                        qrDiv.style.marginBottom = '4px';
+                        qrDiv.style.marginBottom = '3px';
                         container.appendChild(qrDiv);
                         
                         if (typeof QRCode === 'function') {
                             try {
                                 new QRCode(qrDiv, {
                                     text: matricule,
-                                    width: 85,
-                                    height: 85,
+                                    width: 70,
+                                    height: 70,
                                     colorDark: '#1e3c72',
                                     colorLight: '#ffffff',
                                     correctLevel: QRCode.CorrectLevel.M
@@ -967,10 +959,10 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                             try {
                                 JsBarcode(barcodeSvg, matricule, {
                                     format: "CODE128",
-                                    width: 1.3,
-                                    height: 42,
+                                    width: 1.2,
+                                    height: 40,
                                     displayValue: true,
-                                    fontSize: 10,
+                                    fontSize: 9,
                                     font: "monospace",
                                     textMargin: 2,
                                     background: "#ffffff",
