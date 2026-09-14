@@ -16,6 +16,10 @@ if (isset($_GET['employe_id']) && !empty($_GET['employe_id'])) {
 
 $format = $_GET['format'] ?? 'qr';
 $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
+
+// Calcul de la date d'expiration (4 ans à partir d'aujourd'hui)
+$dateEmission = date('d/m/Y');
+$dateExpiration = date('d/m/Y', strtotime('+4 years'));
 ?>
 <!DOCTYPE html>
 <html>
@@ -241,20 +245,28 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             display: block;
         }
         
-        /* Pied du badge */
+        /* Pied du badge - AVEC DATE D'EXPIRATION */
         .badge-footer {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            padding: 6px 15px;
+            padding: 5px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 8px;
-            letter-spacing: 0.3px;
+            font-size: 7px;
+            letter-spacing: 0.2px;
             flex-shrink: 0;
+            gap: 4px;
         }
         .badge-footer .date {
             opacity: 0.9;
+            font-size: 7px;
+            white-space: nowrap;
+        }
+        .badge-footer .expiration {
+            opacity: 0.9;
+            font-size: 7px;
+            white-space: nowrap;
         }
         .badge-footer .statut {
             background: #27ae60;
@@ -263,6 +275,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             font-weight: 700;
             font-size: 7px;
             letter-spacing: 0.8px;
+            white-space: nowrap;
         }
         
         /* Grille des badges */
@@ -463,7 +476,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
     <div class="container">
         <div class="page-header no-print">
             <h1>🎫 Génération de Badges Standards</h1>
-            <p>Format ID-1 (54 × 85.6 mm) - Format réel des badges d'accès d'entreprise</p>
+            <p>Format ID-1 (54 × 85.6 mm) - Validité : 4 ans</p>
         </div>
         
         <!-- Onglets format -->
@@ -481,6 +494,8 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             📸 <strong>Photos des employés :</strong> Les photos sont gérées depuis la page 
             <a href="employes.php">👥 Employés</a>. 
             Ajoutez ou modifiez une photo en cliquant sur "+ Ajouter un employé".
+            <br>
+            ⏳ <strong>Validité :</strong> Les badges sont valides pendant <strong>4 ans</strong> à compter de leur émission.
         </div>
         
         <div class="card no-print">
@@ -608,7 +623,8 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                     </div>
                     
                     <div class="badge-footer">
-                        <span class="date">📅 <?= date('d/m/Y') ?></span>
+                        <span class="date">📅 Émis: <?= $dateEmission ?></span>
+                        <span class="expiration">⏳ Exp: <?= $dateExpiration ?></span>
                         <span class="statut">● ACTIF</span>
                     </div>
                 </div>
@@ -619,6 +635,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             window.addEventListener('load', function() {
                 console.log('=== Badge standard ID-1 ===');
                 console.log('Photo: 115x115 | QR: 110x110 | Format:', '<?= $format ?>');
+                console.log('Émis:', '<?= $dateEmission ?>', '| Expire:', '<?= $dateExpiration ?>');
                 
                 const matricule = '<?= htmlspecialchars($employeSelectionne['matricule']) ?>';
                 const codeContainer = document.getElementById('code-<?= $employeSelectionne['id'] ?>');
@@ -841,7 +858,8 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         </div>
                         
                         <div class="badge-footer">
-                            <span class="date">📅 <?= date('d/m/Y') ?></span>
+                            <span class="date">📅 Émis: <?= $dateEmission ?></span>
+                            <span class="expiration">⏳ Exp: <?= $dateExpiration ?></span>
                             <span class="statut">● ACTIF</span>
                         </div>
                     </div>
