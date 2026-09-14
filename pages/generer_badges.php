@@ -9,7 +9,6 @@ require_once '../classes/Employe.php';
 $employe = new Employe();
 $employes = $employe->getAll();
 
-// Récupérer l'employé sélectionné
 $employeSelectionne = null;
 if (isset($_GET['employe_id']) && !empty($_GET['employe_id'])) {
     $employeSelectionne = $employe->getById($_GET['employe_id']);
@@ -27,11 +26,12 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
     <link rel="stylesheet" href="../css/style.css">
     
     <!-- Bibliothèques -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
+        /* ========== STYLES GÉNÉRAUX DE LA PAGE ========== */
         .badge-tabs {
             display: flex;
             gap: 10px;
@@ -61,29 +61,37 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             border-color: #2c3e50;
         }
         
-        /* ============ BADGE PROFESSIONNEL ============ */
-        .badge-pro {
-            width: 340px;
-            height: 540px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        /* ========== BADGE STANDARD ID-1 VERTICAL ==========
+           Format réel : 54 mm × 85.6 mm
+           Ratio : 1 : 1.585
+           Taille web : 380 × 602 pixels
+           ================================================= */
+        .badge-standard {
+            /* Dimensions format ID-1 vertical (badge d'accès standard) */
+            width: 380px;
+            height: 602px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.25);
             overflow: hidden;
             position: relative;
             margin: 20px auto;
             font-family: 'Segoe UI', Arial, sans-serif;
             border: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
         }
         
-        /* En-tête du badge */
+        /* En-tête */
         .badge-header {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            padding: 15px 20px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             position: relative;
+            flex-shrink: 0;
         }
         .badge-header::after {
             content: '';
@@ -91,48 +99,47 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px;
             background: linear-gradient(90deg, #f39c12, #e74c3c, #9b59b6);
         }
         .badge-header .logo {
-            font-size: 32px;
+            font-size: 22px;
         }
         .badge-header .title {
             flex: 1;
         }
         .badge-header .title h2 {
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 700;
             margin: 0;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
         .badge-header .title p {
-            font-size: 10px;
+            font-size: 8px;
             opacity: 0.85;
-            margin: 2px 0 0;
-            letter-spacing: 1px;
+            margin: 1px 0 0;
+            letter-spacing: 0.8px;
             text-transform: uppercase;
         }
         
-        /* Photo de l'employé */
+        /* Photo */
         .badge-photo-section {
             display: flex;
             justify-content: center;
-            padding: 20px 0 10px;
-            position: relative;
+            padding: 12px 0 6px;
+            flex-shrink: 0;
         }
         .badge-photo {
-            width: 130px;
-            height: 130px;
+            width: 90px;
+            height: 90px;
             border-radius: 50%;
-            border: 5px solid #ffffff;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border: 4px solid #ffffff;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
             overflow: hidden;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
         .badge-photo img {
             width: 100%;
@@ -141,118 +148,131 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
         }
         .badge-photo .initials {
             color: white;
-            font-size: 48px;
+            font-size: 32px;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         
         /* Informations */
         .badge-info {
             text-align: center;
-            padding: 5px 20px 15px;
+            padding: 4px 15px 8px;
+            flex-shrink: 0;
         }
         .badge-info .nom-complet {
-            font-size: 22px;
+            font-size: 16px;
             font-weight: 800;
             color: #1e3c72;
-            margin: 0 0 5px;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
+            margin: 0 0 3px;
+            letter-spacing: 0.3px;
+            line-height: 1.15;
         }
         .badge-info .fonction {
-            font-size: 14px;
+            font-size: 10px;
             color: #7f8c8d;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 0 0 10px;
+            letter-spacing: 1.5px;
+            margin: 0 0 6px;
         }
         .badge-info .departement {
             display: inline-block;
             background: #e8f4fd;
             color: #2980b9;
-            padding: 4px 15px;
-            border-radius: 20px;
-            font-size: 11px;
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 9px;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
         }
         
         /* Séparateur */
         .badge-separator {
             height: 1px;
             background: linear-gradient(90deg, transparent, #ddd, transparent);
-            margin: 10px 30px;
+            margin: 4px 20px;
+            flex-shrink: 0;
         }
         
         /* Matricule */
         .badge-matricule {
             text-align: center;
-            padding: 5px 20px;
+            padding: 4px 15px;
+            flex-shrink: 0;
         }
         .badge-matricule .label {
-            font-size: 9px;
+            font-size: 7px;
             color: #95a5a6;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         .badge-matricule .value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 800;
             color: #e74c3c;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             font-family: 'Courier New', monospace;
         }
         
-        /* Code-barres / QR Code */
+        /* Zone code QR / code-barres */
         .badge-code {
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 10px 20px;
-            min-height: 100px;
+            padding: 6px 15px;
+            flex-direction: column;
+            gap: 5px;
+            background: #ffffff;
+            min-height: 0;
+            overflow: hidden;
+        }
+        .badge-code > div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .badge-code svg,
         .badge-code canvas,
         .badge-code img {
             max-width: 100%;
+            height: auto;
+            display: block;
         }
         
         /* Pied du badge */
         .badge-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            padding: 8px 15px;
+            padding: 6px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 9px;
-            letter-spacing: 0.5px;
+            font-size: 8px;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
         }
         .badge-footer .date {
             opacity: 0.9;
         }
         .badge-footer .statut {
             background: #27ae60;
-            padding: 2px 10px;
-            border-radius: 10px;
+            padding: 2px 8px;
+            border-radius: 8px;
             font-weight: 700;
-            font-size: 8px;
-            letter-spacing: 1px;
+            font-size: 7px;
+            letter-spacing: 0.8px;
         }
         
         /* Grille des badges */
         .grid-badges {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
             margin: 20px 0;
+            justify-items: center;
         }
         
         /* Boutons */
@@ -313,7 +333,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             border-radius: 8px;
         }
         
-        /* Liste des employés */
+        /* Liste employés */
         .employe-select-card {
             background: #f8f9fa;
             padding: 15px;
@@ -381,7 +401,6 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
         .btn-mini.both { background: #2c3e50; }
         .btn-mini.both:hover { background: #34495e; }
         
-        /* Info section */
         .info-section {
             background: #d4edda;
             padding: 15px 20px;
@@ -396,13 +415,13 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             font-weight: bold;
         }
         
-        /* Badge container pour capture */
         .badge-container {
             display: flex;
             justify-content: center;
             padding: 20px 0;
         }
         
+        /* Impression */
         @media print {
             .navbar, .no-print, .actions-bar, .badge-tabs, .info-section {
                 display: none !important;
@@ -415,14 +434,14 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                 padding: 0;
             }
             .grid-badges {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
+                grid-template-columns: repeat(2, 380px);
+                gap: 15px;
             }
-            .badge-pro {
+            .badge-standard {
                 page-break-inside: avoid;
                 box-shadow: none;
                 border: 1px solid #000;
-                transform: scale(0.9);
+                margin: 5px;
             }
         }
     </style>
@@ -444,26 +463,27 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
     
     <div class="container">
         <div class="page-header no-print">
-            <h1>🎫 Génération de Badges Professionnels</h1>
-            <p>Badges avec photo, nom, fonction et code QR/barres</p>
+            <h1>🎫 Génération de Badges Standards</h1>
+            <p>Format ID-1 (54 × 85.6 mm) - Format réel des badges d'accès d'entreprise</p>
         </div>
         
         <!-- Onglets format -->
         <div class="badge-tabs no-print">
-            <a href="?format=qr" class="tab-btn <?= ($format === 'qr') ? 'active' : '' ?>">📱 QR Code</a>
-            <a href="?format=barcode" class="tab-btn <?= ($format === 'barcode') ? 'active' : '' ?>">📊 Code-barres</a>
-            <a href="?format=both" class="tab-btn <?= ($format === 'both') ? 'active' : '' ?>">🎯 Les deux</a>
+            <a href="?format=qr<?= $employeSelectionne ? '&employe_id=' . $employeSelectionne['id'] : '' ?><?= $tous ? '&tous=1' : '' ?>" 
+               class="tab-btn <?= ($format === 'qr') ? 'active' : '' ?>">📱 QR Code uniquement</a>
+            <a href="?format=barcode<?= $employeSelectionne ? '&employe_id=' . $employeSelectionne['id'] : '' ?><?= $tous ? '&tous=1' : '' ?>" 
+               class="tab-btn <?= ($format === 'barcode') ? 'active' : '' ?>">📊 Code-barres uniquement</a>
+            <a href="?format=both<?= $employeSelectionne ? '&employe_id=' . $employeSelectionne['id'] : '' ?><?= $tous ? '&tous=1' : '' ?>" 
+               class="tab-btn <?= ($format === 'both') ? 'active' : '' ?>">🎯 Les deux</a>
         </div>
         
         <?php if (!$employeSelectionne && !$tous): ?>
-        <!-- Info photo -->
         <div class="info-section no-print">
             📸 <strong>Photos des employés :</strong> Les photos sont gérées depuis la page 
             <a href="employes.php">👥 Employés</a>. 
             Ajoutez ou modifiez une photo en cliquant sur "+ Ajouter un employé".
         </div>
         
-        <!-- Sélection employé -->
         <div class="card no-print">
             <h2>👤 Générer pour un employé</h2>
             <form method="GET">
@@ -480,14 +500,13 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                     </select>
                 </div>
                 <div class="actions-bar">
-                    <button type="submit" class="btn-generer btn-qr">📱 QR Code</button>
+                    <button type="submit" class="btn-generer btn-qr" onclick="document.querySelector('[name=format]').value='qr'">📱 QR Code</button>
                     <button type="submit" class="btn-generer btn-barcode" onclick="document.querySelector('[name=format]').value='barcode'">📊 Code-barres</button>
                     <button type="submit" class="btn-generer btn-both" onclick="document.querySelector('[name=format]').value='both'">🎯 Les deux</button>
                 </div>
             </form>
         </div>
         
-        <!-- Générer pour tous -->
         <div class="card no-print">
             <h2>👥 Générer pour tous les employés</h2>
             <div class="actions-bar">
@@ -497,7 +516,6 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             </div>
         </div>
         
-        <!-- Liste rapide -->
         <div class="card no-print">
             <h2>⚡ Génération rapide</h2>
             <?php foreach ($employes as $e): 
@@ -506,9 +524,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                 <div class="employe-select-card">
                     <div class="employe-info-mini">
                         <?php if (!empty($e['photo']) && file_exists('../' . $e['photo'])): ?>
-                            <img src="../<?= htmlspecialchars($e['photo']) ?>" 
-                                 alt="Photo" 
-                                 class="mini-photo">
+                            <img src="../<?= htmlspecialchars($e['photo']) ?>" alt="Photo" class="mini-photo">
                         <?php else: ?>
                             <div class="mini-photo-placeholder"><?= $init ?></div>
                         <?php endif; ?>
@@ -530,10 +546,17 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
         <!-- Badge pour un employé -->
         <?php if ($employeSelectionne): 
             $initiales = strtoupper(substr($employeSelectionne['prenom'], 0, 1) . substr($employeSelectionne['nom'], 0, 1));
+            $formatLabel = [
+                'qr' => '📱 QR Code',
+                'barcode' => '📊 Code-barres',
+                'both' => '🎯 QR Code + Code-barres'
+            ][$format] ?? '📱 QR Code';
         ?>
         <div class="card">
             <div class="card-header no-print">
-                <h2>🎫 Badge de <?= htmlspecialchars($employeSelectionne['nom'] . ' ' . $employeSelectionne['prenom']) ?></h2>
+                <h2>🎫 Badge de <?= htmlspecialchars($employeSelectionne['nom'] . ' ' . $employeSelectionne['prenom']) ?> 
+                    <small style="color: #7f8c8d; font-size: 14px;">- <?= $formatLabel ?></small>
+                </h2>
                 <div class="export-actions">
                     <button class="btn btn-print" onclick="window.print()">🖨️ Imprimer</button>
                     <button class="btn btn-download" onclick="downloadBadge('badge-<?= $employeSelectionne['id'] ?>')">💾 Télécharger PNG</button>
@@ -541,7 +564,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
             </div>
             
             <div class="badge-container">
-                <div class="badge-pro" id="badge-<?= $employeSelectionne['id'] ?>">
+                <div class="badge-standard" id="badge-<?= $employeSelectionne['id'] ?>">
                     <!-- En-tête -->
                     <div class="badge-header">
                         <div class="logo">🏢</div>
@@ -562,7 +585,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         </div>
                     </div>
                     
-                    <!-- Info -->
+                    <!-- Infos -->
                     <div class="badge-info">
                         <h3 class="nom-complet">
                             <?= htmlspecialchars(strtoupper($employeSelectionne['nom']) . ' ' . $employeSelectionne['prenom']) ?>
@@ -585,18 +608,9 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                         <div class="value"><?= htmlspecialchars($employeSelectionne['matricule']) ?></div>
                     </div>
                     
-                    <!-- Code-barres / QR -->
-                    <div class="badge-code">
-                        <?php if ($format === 'qr'): ?>
-                            <div id="qr-<?= $employeSelectionne['id'] ?>"></div>
-                        <?php elseif ($format === 'barcode'): ?>
-                            <svg id="barcode-<?= $employeSelectionne['id'] ?>"></svg>
-                        <?php else: ?>
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
-                                <div id="qr-<?= $employeSelectionne['id'] ?>"></div>
-                                <svg id="barcode-<?= $employeSelectionne['id'] ?>"></svg>
-                            </div>
-                        <?php endif; ?>
+                    <!-- Zone QR / Code-barres -->
+                    <div class="badge-code" id="code-<?= $employeSelectionne['id'] ?>">
+                        <!-- QR/Code-barres inséré par JavaScript -->
                     </div>
                     
                     <!-- Footer -->
@@ -606,62 +620,185 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                     </div>
                 </div>
             </div>
-            
-            <script>
-                // Générer le QR Code
-                <?php if ($format === 'qr' || $format === 'both'): ?>
-                QRCode.toCanvas(
-                    document.createElement('canvas'),
-                    '<?= htmlspecialchars($employeSelectionne['matricule']) ?>',
-                    {
-                        width: 100,
-                        margin: 1,
-                        color: { dark: '#1e3c72', light: '#ffffff' }
-                    },
-                    function(error, canvas) {
-                        if (!error) {
-                            document.getElementById('qr-<?= $employeSelectionne['id'] ?>').appendChild(canvas);
-                        }
-                    }
-                );
-                <?php endif; ?>
-                
-                // Générer le code-barres
-                <?php if ($format === 'barcode' || $format === 'both'): ?>
-                JsBarcode("#barcode-<?= $employeSelectionne['id'] ?>", "<?= htmlspecialchars($employeSelectionne['matricule']) ?>", {
-                    format: "CODE128",
-                    width: 1.5,
-                    height: 50,
-                    displayValue: true,
-                    fontSize: 12,
-                    font: "monospace",
-                    textMargin: 2,
-                    background: "#ffffff",
-                    lineColor: "#1e3c72"
-                });
-                <?php endif; ?>
-                
-                function downloadBadge(id) {
-                    const badge = document.getElementById(id);
-                    html2canvas(badge, {
-                        backgroundColor: '#ffffff',
-                        scale: 3,
-                        useCORS: true
-                    }).then(canvas => {
-                        const link = document.createElement('a');
-                        link.download = 'badge_<?= htmlspecialchars($employeSelectionne['matricule']) ?>.png';
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                    });
-                }
-            </script>
         </div>
         
-        <?php elseif ($tous): ?>
+        <script>
+            window.addEventListener('load', function() {
+                console.log('=== Badge standard ID-1 ===');
+                console.log('Dimensions: 380 × 602 px (ratio 54 × 85.6 mm)');
+                console.log('QRCode:', typeof QRCode, '| JsBarcode:', typeof JsBarcode);
+                
+                const matricule = '<?= htmlspecialchars($employeSelectionne['matricule']) ?>';
+                const codeContainer = document.getElementById('code-<?= $employeSelectionne['id'] ?>');
+                const format = '<?= $format ?>';
+                
+                codeContainer.style.display = 'flex';
+                codeContainer.style.flexDirection = 'column';
+                codeContainer.style.alignItems = 'center';
+                codeContainer.style.justifyContent = 'center';
+                codeContainer.style.gap = '6px';
+                
+                // ==================== QR CODE UNIQUEMENT ====================
+                if (format === 'qr') {
+                    console.log('→ QR Code uniquement');
+                    const qrDiv = document.createElement('div');
+                    qrDiv.style.display = 'flex';
+                    qrDiv.style.justifyContent = 'center';
+                    qrDiv.style.alignItems = 'center';
+                    codeContainer.appendChild(qrDiv);
+                    
+                    if (typeof QRCode === 'function') {
+                        try {
+                            new QRCode(qrDiv, {
+                                text: matricule,
+                                width: 130,
+                                height: 130,
+                                colorDark: '#1e3c72',
+                                colorLight: '#ffffff',
+                                correctLevel: QRCode.CorrectLevel.M
+                            });
+                            console.log('✅ QR généré');
+                        } catch (e) {
+                            console.error('Erreur QR:', e);
+                            qrDiv.innerHTML = '<span style="color:red;font-size:11px;">Erreur QR</span>';
+                        }
+                    } else {
+                        qrDiv.innerHTML = '<span style="color:red;font-size:11px;">QRCode non chargé</span>';
+                    }
+                }
+                
+                // ==================== CODE-BARRES UNIQUEMENT ====================
+                else if (format === 'barcode') {
+                    console.log('→ Code-barres uniquement');
+                    const barcodeDiv = document.createElement('div');
+                    barcodeDiv.style.width = '100%';
+                    barcodeDiv.style.display = 'flex';
+                    barcodeDiv.style.justifyContent = 'center';
+                    barcodeDiv.style.alignItems = 'center';
+                    codeContainer.appendChild(barcodeDiv);
+                    
+                    const barcodeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    barcodeDiv.appendChild(barcodeSvg);
+                    
+                    if (typeof JsBarcode !== 'undefined') {
+                        try {
+                            JsBarcode(barcodeSvg, matricule, {
+                                format: "CODE128",
+                                width: 1.8,
+                                height: 65,
+                                displayValue: true,
+                                fontSize: 12,
+                                font: "monospace",
+                                textMargin: 3,
+                                background: "#ffffff",
+                                lineColor: "#1e3c72",
+                                margin: 5
+                            });
+                            console.log('✅ Code-barres généré');
+                        } catch (e) {
+                            console.error('Erreur code-barres:', e);
+                            barcodeDiv.innerHTML = '<span style="color:red;font-size:11px;">Erreur code-barres</span>';
+                        }
+                    } else {
+                        codeContainer.innerHTML = '<span style="color:red;font-size:11px;">JsBarcode non chargé</span>';
+                    }
+                }
+                
+                // ==================== LES DEUX ====================
+                else if (format === 'both') {
+                    console.log('→ QR Code + Code-barres');
+                    
+                    // QR CODE
+                    const qrDiv = document.createElement('div');
+                    qrDiv.style.display = 'flex';
+                    qrDiv.style.justifyContent = 'center';
+                    qrDiv.style.alignItems = 'center';
+                    qrDiv.style.marginBottom = '4px';
+                    codeContainer.appendChild(qrDiv);
+                    
+                    if (typeof QRCode === 'function') {
+                        try {
+                            new QRCode(qrDiv, {
+                                text: matricule,
+                                width: 85,
+                                height: 85,
+                                colorDark: '#1e3c72',
+                                colorLight: '#ffffff',
+                                correctLevel: QRCode.CorrectLevel.M
+                            });
+                            console.log('✅ QR généré');
+                        } catch (e) {
+                            console.error('Erreur QR:', e);
+                            qrDiv.innerHTML = '<span style="color:red;font-size:11px;">Erreur QR</span>';
+                        }
+                    } else {
+                        qrDiv.innerHTML = '<span style="color:red;font-size:11px;">QRCode non chargé</span>';
+                    }
+                    
+                    // CODE-BARRES
+                    const barcodeDiv = document.createElement('div');
+                    barcodeDiv.style.width = '100%';
+                    barcodeDiv.style.display = 'flex';
+                    barcodeDiv.style.justifyContent = 'center';
+                    barcodeDiv.style.alignItems = 'center';
+                    codeContainer.appendChild(barcodeDiv);
+                    
+                    const barcodeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    barcodeDiv.appendChild(barcodeSvg);
+                    
+                    if (typeof JsBarcode !== 'undefined') {
+                        try {
+                            JsBarcode(barcodeSvg, matricule, {
+                                format: "CODE128",
+                                width: 1.3,
+                                height: 42,
+                                displayValue: true,
+                                fontSize: 10,
+                                font: "monospace",
+                                textMargin: 2,
+                                background: "#ffffff",
+                                lineColor: "#1e3c72",
+                                margin: 5
+                            });
+                            console.log('✅ Code-barres généré');
+                        } catch (e) {
+                            console.error('Erreur code-barres:', e);
+                            barcodeDiv.innerHTML = '<span style="color:red;font-size:11px;">Erreur code-barres</span>';
+                        }
+                    }
+                }
+            });
+            
+            function downloadBadge(id) {
+                const badge = document.getElementById(id);
+                if (typeof html2canvas === 'undefined') {
+                    alert('Veuillez patienter...');
+                    return;
+                }
+                html2canvas(badge, {
+                    backgroundColor: '#ffffff',
+                    scale: 3,
+                    useCORS: true
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'badge_<?= htmlspecialchars($employeSelectionne['matricule']) ?>.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            }
+        </script>
+        
+        <?php elseif ($tous): 
+            $formatLabel = [
+                'qr' => '📱 QR Code',
+                'barcode' => '📊 Code-barres',
+                'both' => '🎯 QR Code + Code-barres'
+            ][$format] ?? '📱 QR Code';
+        ?>
         <!-- Tous les badges -->
         <div class="card">
             <div class="card-header no-print">
-                <h2>🎫 Tous les badges (<?= count($employes) ?> employés)</h2>
+                <h2>🎫 Tous les badges (<?= count($employes) ?> employés) - <?= $formatLabel ?></h2>
                 <button class="btn btn-print" onclick="window.print()">🖨️ Imprimer tous</button>
             </div>
             
@@ -669,7 +806,7 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                 <?php foreach ($employes as $e): 
                     $init = strtoupper(substr($e['prenom'], 0, 1) . substr($e['nom'], 0, 1));
                 ?>
-                    <div class="badge-pro" id="badge-<?= $e['id'] ?>">
+                    <div class="badge-standard" id="badge-<?= $e['id'] ?>">
                         <div class="badge-header">
                             <div class="logo">🏢</div>
                             <div class="title">
@@ -707,17 +844,8 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                             <div class="value"><?= htmlspecialchars($e['matricule']) ?></div>
                         </div>
                         
-                        <div class="badge-code">
-                            <?php if ($format === 'qr'): ?>
-                                <div class="qr-container" data-matricule="<?= htmlspecialchars($e['matricule']) ?>"></div>
-                            <?php elseif ($format === 'barcode'): ?>
-                                <svg class="barcode-container" data-matricule="<?= htmlspecialchars($e['matricule']) ?>"></svg>
-                            <?php else: ?>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                                    <div class="qr-container" data-matricule="<?= htmlspecialchars($e['matricule']) ?>"></div>
-                                    <svg class="barcode-container" data-matricule="<?= htmlspecialchars($e['matricule']) ?>"></svg>
-                                </div>
-                            <?php endif; ?>
+                        <div class="badge-code" data-matricule="<?= htmlspecialchars($e['matricule']) ?>">
+                            <!-- QR/Barcode inséré par JS -->
                         </div>
                         
                         <div class="badge-footer">
@@ -727,46 +855,138 @@ $tous = isset($_GET['tous']) && $_GET['tous'] == 1;
                     </div>
                 <?php endforeach; ?>
             </div>
-            
-            <script>
-                // QR Codes
-                <?php if ($format === 'qr' || $format === 'both'): ?>
-                document.querySelectorAll('.qr-container').forEach(container => {
-                    const matricule = container.getAttribute('data-matricule');
-                    QRCode.toCanvas(
-                        document.createElement('canvas'),
-                        matricule,
-                        {
-                            width: 90,
-                            margin: 1,
-                            color: { dark: '#1e3c72', light: '#ffffff' }
-                        },
-                        function(error, canvas) {
-                            if (!error) container.appendChild(canvas);
-                        }
-                    );
-                });
-                <?php endif; ?>
-                
-                // Code-barres
-                <?php if ($format === 'barcode' || $format === 'both'): ?>
-                document.querySelectorAll('.barcode-container').forEach(svg => {
-                    const matricule = svg.getAttribute('data-matricule');
-                    JsBarcode(svg, matricule, {
-                        format: "CODE128",
-                        width: 1.2,
-                        height: 40,
-                        displayValue: true,
-                        fontSize: 10,
-                        font: "monospace",
-                        textMargin: 1,
-                        background: "#ffffff",
-                        lineColor: "#1e3c72"
-                    });
-                });
-                <?php endif; ?>
-            </script>
         </div>
+        
+        <script>
+            window.addEventListener('load', function() {
+                console.log('=== Tous les badges standards ===');
+                const format = '<?= $format ?>';
+                
+                document.querySelectorAll('.badge-code').forEach(container => {
+                    const matricule = container.getAttribute('data-matricule');
+                    
+                    container.style.display = 'flex';
+                    container.style.flexDirection = 'column';
+                    container.style.alignItems = 'center';
+                    container.style.justifyContent = 'center';
+                    container.style.gap = '6px';
+                    
+                    // QR UNIQUEMENT
+                    if (format === 'qr') {
+                        const qrDiv = document.createElement('div');
+                        qrDiv.style.display = 'flex';
+                        qrDiv.style.justifyContent = 'center';
+                        qrDiv.style.alignItems = 'center';
+                        container.appendChild(qrDiv);
+                        
+                        if (typeof QRCode === 'function') {
+                            try {
+                                new QRCode(qrDiv, {
+                                    text: matricule,
+                                    width: 130,
+                                    height: 130,
+                                    colorDark: '#1e3c72',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            } catch (e) {
+                                console.error('Erreur QR ' + matricule, e);
+                            }
+                        }
+                    }
+                    
+                    // CODE-BARRES UNIQUEMENT
+                    else if (format === 'barcode') {
+                        const barcodeDiv = document.createElement('div');
+                        barcodeDiv.style.width = '100%';
+                        barcodeDiv.style.display = 'flex';
+                        barcodeDiv.style.justifyContent = 'center';
+                        barcodeDiv.style.alignItems = 'center';
+                        container.appendChild(barcodeDiv);
+                        
+                        const barcodeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        barcodeDiv.appendChild(barcodeSvg);
+                        
+                        if (typeof JsBarcode !== 'undefined') {
+                            try {
+                                JsBarcode(barcodeSvg, matricule, {
+                                    format: "CODE128",
+                                    width: 1.8,
+                                    height: 65,
+                                    displayValue: true,
+                                    fontSize: 12,
+                                    font: "monospace",
+                                    textMargin: 3,
+                                    background: "#ffffff",
+                                    lineColor: "#1e3c72",
+                                    margin: 5
+                                });
+                            } catch (e) {
+                                console.error('Erreur code-barres ' + matricule, e);
+                            }
+                        }
+                    }
+                    
+                    // LES DEUX
+                    else if (format === 'both') {
+                        // QR
+                        const qrDiv = document.createElement('div');
+                        qrDiv.style.display = 'flex';
+                        qrDiv.style.justifyContent = 'center';
+                        qrDiv.style.alignItems = 'center';
+                        qrDiv.style.marginBottom = '4px';
+                        container.appendChild(qrDiv);
+                        
+                        if (typeof QRCode === 'function') {
+                            try {
+                                new QRCode(qrDiv, {
+                                    text: matricule,
+                                    width: 85,
+                                    height: 85,
+                                    colorDark: '#1e3c72',
+                                    colorLight: '#ffffff',
+                                    correctLevel: QRCode.CorrectLevel.M
+                                });
+                            } catch (e) {
+                                console.error('Erreur QR ' + matricule, e);
+                            }
+                        }
+                        
+                        // Code-barres
+                        const barcodeDiv = document.createElement('div');
+                        barcodeDiv.style.width = '100%';
+                        barcodeDiv.style.display = 'flex';
+                        barcodeDiv.style.justifyContent = 'center';
+                        barcodeDiv.style.alignItems = 'center';
+                        container.appendChild(barcodeDiv);
+                        
+                        const barcodeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        barcodeDiv.appendChild(barcodeSvg);
+                        
+                        if (typeof JsBarcode !== 'undefined') {
+                            try {
+                                JsBarcode(barcodeSvg, matricule, {
+                                    format: "CODE128",
+                                    width: 1.3,
+                                    height: 42,
+                                    displayValue: true,
+                                    fontSize: 10,
+                                    font: "monospace",
+                                    textMargin: 2,
+                                    background: "#ffffff",
+                                    lineColor: "#1e3c72",
+                                    margin: 5
+                                });
+                            } catch (e) {
+                                console.error('Erreur code-barres ' + matricule, e);
+                            }
+                        }
+                    }
+                });
+                
+                console.log('✅ Tous les badges générés !');
+            });
+        </script>
         <?php endif; ?>
     </div>
 </body>

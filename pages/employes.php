@@ -273,7 +273,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                     <div class="form-group">
                         <label>📸 Photo de l'employé</label>
                         <input type="file" name="photo" accept="image/*" onchange="previewImage(event)">
-                        <small style="color: #95a5a6;">Formats acceptés : JPG, PNG, GIF, WEBP (max 5 Mo)</small>
+                        <small style="color: #95a5a6;">Formats : JPG, PNG, GIF, WEBP</small>
                         <div id="photoPreviewContainer" style="margin-top: 10px;"></div>
                     </div>
                     

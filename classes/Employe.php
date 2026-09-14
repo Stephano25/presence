@@ -27,11 +27,27 @@ class Employe {
     }
     
     public function create($data) {
-        $sql = "INSERT INTO employes (matricule, nom, prenom, email, telephone, poste, departement, date_embauche, status) 
-                VALUES (:matricule, :nom, :prenom, :email, :telephone, :poste, :departement, :date_embauche, :status)";
+        // Construire la requête avec uniquement les champs présents
+        $sql = "INSERT INTO employes (matricule, nom, prenom, email, telephone, poste, departement, date_embauche, status, photo) 
+                VALUES (:matricule, :nom, :prenom, :email, :telephone, :poste, :departement, :date_embauche, :status, :photo)";
         
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute($data);
+        
+        // S'assurer que toutes les clés existent
+        $params = [
+            'matricule' => $data['matricule'] ?? null,
+            'nom' => $data['nom'] ?? null,
+            'prenom' => $data['prenom'] ?? null,
+            'email' => $data['email'] ?? null,
+            'telephone' => $data['telephone'] ?? null,
+            'poste' => $data['poste'] ?? null,
+            'departement' => $data['departement'] ?? null,
+            'date_embauche' => $data['date_embauche'] ?? null,
+            'status' => $data['status'] ?? 'actif',
+            'photo' => $data['photo'] ?? null
+        ];
+        
+        return $stmt->execute($params);
     }
     
     public function update($id, $data) {
@@ -44,12 +60,35 @@ class Employe {
                 poste = :poste,
                 departement = :departement,
                 date_embauche = :date_embauche,
-                status = :status
-                WHERE id = :id";
+                status = :status";
+        
+        // Ajouter la photo si elle est fournie
+        if (isset($data['photo'])) {
+            $sql .= ", photo = :photo";
+        }
+        
+        $sql .= " WHERE id = :id";
         
         $stmt = $this->db->prepare($sql);
-        $data['id'] = $id;
-        return $stmt->execute($data);
+        
+        $params = [
+            'id' => $id,
+            'matricule' => $data['matricule'] ?? null,
+            'nom' => $data['nom'] ?? null,
+            'prenom' => $data['prenom'] ?? null,
+            'email' => $data['email'] ?? null,
+            'telephone' => $data['telephone'] ?? null,
+            'poste' => $data['poste'] ?? null,
+            'departement' => $data['departement'] ?? null,
+            'date_embauche' => $data['date_embauche'] ?? null,
+            'status' => $data['status'] ?? 'actif'
+        ];
+        
+        if (isset($data['photo'])) {
+            $params['photo'] = $data['photo'];
+        }
+        
+        return $stmt->execute($params);
     }
     
     public function delete($id) {
