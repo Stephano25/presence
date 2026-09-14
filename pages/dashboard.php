@@ -2,7 +2,7 @@
 require_once '../config/config.php';
 require_once '../includes/session.php';
 requireLogin();
-require_once '../includes/functions.php';  // ← AJOUT OBLIGATOIRE
+require_once '../includes/functions.php';
 require_once '../classes/Database.php';
 require_once '../classes/Employe.php';
 require_once '../classes/Pointage.php';
@@ -32,12 +32,12 @@ $pointagesAujourdhui = $pointage->getPointages([
         <div class="container">
             <a href="dashboard.php" class="navbar-brand"><?= SITE_NAME ?></a>
             <ul class="nav-menu">
-                <li><a href="dashboard.php" class="active">Dashboard</a></li>
-                <li><a href="pointage.php">Pointage</a></li>
-                <li><a href="employes.php">Employés</a></li>
-                <li><a href="export.php">Export</a></li>
-                <li><a href="../scan_badge.php">Scan</a></li>
-                <li><a href="../index.php?logout=1">Déconnexion</a></li>
+                <li><a href="dashboard.php" class="active">📊 Dashboard</a></li>
+                <li><a href="pointage.php">⏱️ Pointage</a></li>
+                <li><a href="employes.php">👥 Employés</a></li>
+                <li><a href="generer_badges.php">🎫 Badges</a></li>
+                <li><a href="export.php">📤 Export</a></li>
+                <li><a href="admin_logout.php" style="color: #e74c3c;">🚪 Déconnexion</a></li>
             </ul>
         </div>
     </nav>
@@ -92,13 +92,7 @@ $pointagesAujourdhui = $pointage->getPointages([
                             <td><?= $index + 1 ?></td>
                             <td><?= htmlspecialchars($p['nom'] . ' ' . $p['prenom']) ?></td>
                             <td><?= htmlspecialchars($p['matricule']) ?></td>
-                            <td>
-                                <?php if ($p['type'] == 'entree'): ?>
-                                    <span class="badge badge-success">Entrée</span>
-                                <?php else: ?>
-                                    <span class="badge badge-danger">Sortie</span>
-                                <?php endif; ?>
-                            </td>
+                            <td><?= getTypeBadge($p['type']) ?></td>
                             <td><?= formatDateTime($p['date_heure']) ?></td>
                         </tr>
                         <?php endforeach; ?>

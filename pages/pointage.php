@@ -315,6 +315,7 @@ $pointagesAujourdhui = $pointage->getPointages([
                 <li><a href="dashboard.php">📊 Dashboard</a></li>
                 <li><a href="pointage.php" class="active">⏱️ Pointage</a></li>
                 <li><a href="employes.php">👥 Employés</a></li>
+                 <li><a href="generer_badges.php">🎫 Badges</a></li>
                 <li><a href="export.php">📤 Export</a></li>
                 <li><a href="admin_logout.php" style="color: #e74c3c;">🚪 Déconnexion</a></li>
             </ul>

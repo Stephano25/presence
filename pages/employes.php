@@ -2,7 +2,7 @@
 require_once '../config/config.php';
 require_once '../includes/session.php';
 requireLogin();
-require_once '../includes/functions.php';  // ← AJOUT OBLIGATOIRE
+require_once '../includes/functions.php';
 require_once '../classes/Database.php';
 require_once '../classes/Employe.php';
 
@@ -40,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             'status' => $_POST['status'] ?? 'actif'
         ];
         
-        // Vérification du matricule unique
         $existing = $employe->getByMatricule($data['matricule']);
         if ($existing) {
             $message = "Ce matricule existe déjà !";
@@ -57,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
     
-    // Modification
     if ($_POST['action'] === 'edit') {
         $id = intval($_POST['id']);
         $data = [
@@ -102,12 +100,12 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
         <div class="container">
             <a href="dashboard.php" class="navbar-brand"><?= SITE_NAME ?></a>
             <ul class="nav-menu">
-                <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="pointage.php">Pointage</a></li>
-                <li><a href="employes.php" class="active">Employés</a></li>
-                <li><a href="export.php">Export</a></li>
-                <li><a href="../scan_badge.php">Scan</a></li>
-                <li><a href="../index.php?logout=1">Déconnexion</a></li>
+                <li><a href="dashboard.php">📊 Dashboard</a></li>
+                <li><a href="pointage.php">⏱️ Pointage</a></li>
+                <li><a href="employes.php" class="active">👥 Employés</a></li>
+                <li><a href="generer_badges.php">🎫 Badges</a></li>
+                <li><a href="export.php">📤 Export</a></li>
+                <li><a href="admin_logout.php" style="color: #e74c3c;">🚪 Déconnexion</a></li>
             </ul>
         </div>
     </nav>
@@ -122,7 +120,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             <div class="alert alert-<?= $messageType ?>"><?= $message ?></div>
         <?php endif; ?>
         
-        <!-- Formulaire de recherche -->
         <div class="search-form">
             <form method="GET" action="">
                 <div class="form-group" style="display: flex; gap: 10px;">
@@ -135,7 +132,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             </form>
         </div>
         
-        <!-- Formulaire d'ajout -->
         <div id="addForm" style="display: none; margin-top: 20px;">
             <div class="card">
                 <h2>Nouvel employé</h2>
@@ -147,12 +143,10 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                             <label>Matricule *</label>
                             <input type="text" name="matricule" required>
                         </div>
-                        
                         <div class="form-group">
                             <label>Nom *</label>
                             <input type="text" name="nom" required>
                         </div>
-                        
                         <div class="form-group">
                             <label>Prénom *</label>
                             <input type="text" name="prenom" required>
@@ -164,7 +158,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                             <label>Email</label>
                             <input type="email" name="email">
                         </div>
-                        
                         <div class="form-group">
                             <label>Téléphone</label>
                             <input type="text" name="telephone">
@@ -176,7 +169,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                             <label>Poste</label>
                             <input type="text" name="poste">
                         </div>
-                        
                         <div class="form-group">
                             <label>Département</label>
                             <input type="text" name="departement">
@@ -188,7 +180,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                             <label>Date d'embauche</label>
                             <input type="date" name="date_embauche">
                         </div>
-                        
                         <div class="form-group">
                             <label>Statut</label>
                             <select name="status">
@@ -207,7 +198,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             </div>
         </div>
         
-        <!-- Liste des employés -->
         <div class="employes-list">
             <h2>Liste des employés</h2>
             <table class="table">

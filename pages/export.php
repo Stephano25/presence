@@ -179,16 +179,16 @@ if (isset($_GET['export']) && !empty($pointages)) {
     </style>
 </head>
 <body>
-    <nav class="navbar">
+        <nav class="navbar">
         <div class="container">
             <a href="dashboard.php" class="navbar-brand"><?= SITE_NAME ?></a>
             <ul class="nav-menu">
-                <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="pointage.php">Pointage</a></li>
-                <li><a href="employes.php">Employés</a></li>
-                <li><a href="export.php" class="active">Export</a></li>
-                <li><a href="../scan_badge.php">Scan</a></li>
-                <li><a href="../index.php?logout=1">Déconnexion</a></li>
+                <li><a href="dashboard.php">📊 Dashboard</a></li>
+                <li><a href="pointage.php">⏱️ Pointage</a></li>
+                <li><a href="employes.php">👥 Employés</a></li>
+                <li><a href="generer_badges.php">🎫 Badges</a></li>
+                <li><a href="export.php" class="active">📤 Export</a></li>
+                <li><a href="admin_logout.php" style="color: #e74c3c;">🚪 Déconnexion</a></li>
             </ul>
         </div>
     </nav>
